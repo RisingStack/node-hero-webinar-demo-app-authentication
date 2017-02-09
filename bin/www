@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+'use strict'
+
+const config = require('../config')
+const server = require('../src/server')
+
+server.listen(config.port, (err) => {
+  if (err) {
+    console.warn('Error happened', err)
+    process.exit(1)
+  }
+  console.log('Server is running on port:', config.port)
+})
