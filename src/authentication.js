@@ -1,7 +1,7 @@
 'use strict'
 
 const crypto = require('crypto')
-const LocalStrategy = require('passport-local').Strategy
+const BasicStrategy = require('passport-http').BasicStrategy
 const _ = require('lodash')
 
 const database = require('./database')
@@ -19,15 +19,6 @@ function validatePassword (userPassword, providedPassword) {
   return crypto.timingSafeEqual(Buffer.from(userPassword), Buffer.from(hashPassword(providedPassword)))
 }
 
-function authenticationMiddleware () {
-  return function (req, res, next) {
-    if (req.isAuthenticated()) {
-      return next()
-    }
-    res.redirect('/login')
-  }
-}
-
 function initialize (passport) {
   passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -38,7 +29,7 @@ function initialize (passport) {
     done(null, user)
   })
 
-  passport.use(new LocalStrategy(
+  passport.use(new BasicStrategy(
     function(username, password, done) {
       const user = _.find(database, { name: username })
 
@@ -48,11 +39,8 @@ function initialize (passport) {
       return done(null, user)
     }
   ))
-
-  passport.authenticationMiddleware = authenticationMiddleware
 }
 
 module.exports = {
-  initialize,
-  authenticationMiddleware
+  initialize
 }
